@@ -143,14 +143,16 @@ class CurrentTrack < WEBrick::HTTPServlet::AbstractServlet
 END
 
     when "/track"
-      t = app("iTunes").current_track
+      dbid = 0
       begin
-        dbid = t.database_ID.get.to_s
+        if app("System Events").processes["iTunes"].get
+          track = app("iTunes").current_track
+          dbid = track.database_ID.get.to_i
+        end
       rescue
-        dbid = "0"
       end
 
-      if dbid == request.query["dbid"].to_s
+      if dbid.to_s == request.query["dbid"]
         response.status = 200
         response["Content-Type"] = "application/javascript"
         response.body = ";"
@@ -158,20 +160,21 @@ END
         artwork = nil
         artwork_type = nil
 
-        if dbid == "0"
-          track = ""
+        if dbid == 0
+          title = ""
           artist = ""
           album = ""
           stars = ""
         else
           begin
-            if t.artworks.get
-              data = t.artworks[1].data_.get.data
+            if track.artworks.get
+              data = track.artworks[1].data_.get.data
 
-              if t.artworks[1].format.get.to_s.match(/PNG/)
+              case track.artworks[1].format.get.to_s
+              when /PNG/
                 artwork_type = "png"
                 artwork = extract_png(data)
-              elsif t.artworks[1].format.get.to_s.match(/JPEG/)
+              when /JPEG/
                 artwork_type = "jpeg"
                 artwork = extract_jpeg(data)
               else
@@ -181,22 +184,22 @@ END
           rescue
           end
 
-          track = t.name.get
-          if track.to_s == ""
-            track = "Unknown Track"
+          title = track.name.get
+          if title.to_s == ""
+            title = "Unknown Track"
           end
 
-          artist = t.artist.get
+          artist = track.artist.get
           if artist.to_s == ""
             artist = "Unknown Artist"
           end
 
-          album = t.album.get
+          album = track.album.get
           if album.to_s == ""
             album = "Unknown Album"
           end
 
-          rating = t.rating.get.to_i
+          rating = track.rating.get.to_i
           stars = ((1 .. (rating.to_f / 20.0).floor).to_a.map{ "&#9733;" } +
             [ "<span class=\"nostar\">" ] +
             (1 .. ((100.0 - rating.to_f) / 20.0).floor).to_a.map{ "&#9734;" } +
@@ -215,7 +218,7 @@ END
         response["Content-Type"] = "application/javascript"
         response.body = <<END
           document.getElementById('track').innerHTML =
-            "#{escape_js(track.downcase)}";
+            "#{escape_js(title.downcase)}";
           document.getElementById('artist').innerHTML =
             "#{escape_js(add_breakpoints(artist.downcase))}";
           document.getElementById('album').innerHTML =
