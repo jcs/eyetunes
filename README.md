@@ -2,7 +2,7 @@ a webserver that serves up html to show the currently playing song in itunes.
 optimized for a tiny 800x480 external display, like a mimo usb monitor, though
 it could just as easily run in an 800x480 browser window on a large screen.
 
-see (http://www.flickr.com/photos/symmetricalism/5095339235/) for a demo.
+see [http://www.flickr.com/photos/symmetricalism/5095339235/] for a demo.
 
 requires the rb-appscript gem to talk to itunes.  it works like this:
 
