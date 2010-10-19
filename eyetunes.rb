@@ -144,53 +144,64 @@ END
 
     when "/track"
       t = app("iTunes").current_track
-      dbid = t.database_ID.get.to_s
+      begin
+        dbid = t.database_ID.get.to_s
+      rescue
+        dbid = "0"
+      end
 
       if dbid == request.query["dbid"].to_s
         response.status = 200
         response["Content-Type"] = "application/javascript"
         response.body = ";"
       else
-        begin
-          artwork = nil
-          artwork_type = nil
+        artwork = nil
+        artwork_type = nil
 
-          if t.artworks.get
-            data = t.artworks[1].data_.get.data
+        if dbid == "0"
+          track = ""
+          artist = ""
+          album = ""
+          stars = ""
+        else
+          begin
+            if t.artworks.get
+              data = t.artworks[1].data_.get.data
 
-            if t.artworks[1].format.get.to_s.match(/PNG/)
-              artwork_type = "png"
-              artwork = extract_png(data)
-            elsif t.artworks[1].format.get.to_s.match(/JPEG/)
-              artwork_type = "jpeg"
-              artwork = extract_jpeg(data)
-            else
-              artwork = nil
+              if t.artworks[1].format.get.to_s.match(/PNG/)
+                artwork_type = "png"
+                artwork = extract_png(data)
+              elsif t.artworks[1].format.get.to_s.match(/JPEG/)
+                artwork_type = "jpeg"
+                artwork = extract_jpeg(data)
+              else
+                artwork = nil
+              end
             end
+          rescue
           end
-        rescue
-        end
 
-        track = t.name.get
-        if track.to_s == ""
-          track = "Unknown Track"
-        end
+          track = t.name.get
+          if track.to_s == ""
+            track = "Unknown Track"
+          end
 
-        artist = t.artist.get
-        if artist.to_s == ""
-          artist = "Unknown Artist"
-        end
+          artist = t.artist.get
+          if artist.to_s == ""
+            artist = "Unknown Artist"
+          end
 
-        album = t.album.get
-        if album.to_s == ""
-          album = "Unknown Album"
-        end
+          album = t.album.get
+          if album.to_s == ""
+            album = "Unknown Album"
+          end
 
-        rating = t.rating.get.to_i
-        stars = ((1 .. (rating.to_f / 20.0).floor).to_a.map{ "&#9733;" } +
-          [ "<span class=\"nostar\">" ] +
-          (1 .. ((100.0 - rating.to_f) / 20.0).floor).to_a.map{ "&#9734;" } +
-          [ "</span>" ]).join("")
+          rating = t.rating.get.to_i
+          stars = ((1 .. (rating.to_f / 20.0).floor).to_a.map{ "&#9733;" } +
+            [ "<span class=\"nostar\">" ] +
+            (1 .. ((100.0 - rating.to_f) / 20.0).floor).to_a.map{ "&#9734;" } +
+            [ "</span>" ]).join("")
+        end
 
         if artwork
           artwork = "data:image/#{artwork_type};base64," +
