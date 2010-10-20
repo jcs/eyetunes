@@ -52,17 +52,25 @@ class CurrentTrack < WEBrick::HTTPServlet::AbstractServlet
         <head>
         <script type="text/javascript">
           var dbid = 0;
+          var paused = false;
 
           function fetch() {
             var req = new XMLHttpRequest();
             req.onload = function() {
               eval(req.responseText);
+
+              if (paused)
+                document.body.className = "paused";
+              else
+                document.body.className = "";
+
               setTimeout("fetch()", 500);
             };
             req.onerror = function() {
               setTimeout("fetch()", 500);
             };
-            req.open("GET", "/track?dbid=" + dbid, true);
+            req.open("GET", "/track?dbid=" + dbid + "&paused=" +
+              (paused ? 1 : 0), true);
             req.send(null);
           }
         </script>
@@ -125,6 +133,12 @@ class CurrentTrack < WEBrick::HTTPServlet::AbstractServlet
           li#stars span.nostar {
             color: #444;
           }
+          body.paused {
+            opacity: 0.3;
+          }
+          body.paused div#track {
+            overflow-x: hidden;
+          }
         </style>
         </head>
         <body>
@@ -144,15 +158,21 @@ END
 
     when "/track"
       dbid = 0
+      paused = false
       begin
         if app("System Events").processes["iTunes"].get
           track = app("iTunes").current_track
           dbid = track.database_ID.get.to_i
+
+          if app("iTunes").player_state.get != :playing
+            paused = true
+          end
         end
       rescue
       end
 
-      if dbid.to_s == request.query["dbid"]
+      if dbid.to_s == request.query["dbid"] &&
+      ((request.query["paused"] == "1") == paused)
         response.status = 200
         response["Content-Type"] = "application/javascript"
         response.body = ";"
@@ -227,6 +247,7 @@ END
           document.getElementById('stars').innerHTML =
             "#{escape_js(stars)}";
           dbid = "#{dbid}";
+          paused = #{paused ? "true" : "false"};
 END
       end
     end
