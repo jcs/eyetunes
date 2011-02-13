@@ -123,6 +123,9 @@ class CurrentTrack < WEBrick::HTTPServlet::AbstractServlet
           li#artist {
             color: #bbb;
           }
+          li.long {
+            font-size: 35pt;
+          }
           li#album {
             color: #999;
           }
@@ -246,6 +249,14 @@ END
           document.getElementById('art').src = "#{artwork}";
           document.getElementById('stars').innerHTML =
             "#{escape_js(stars)}";
+
+          tlen = document.getElementById('artist').innerHTML.length +
+            document.getElementById('album').innerHTML.length;
+
+          document.getElementById('artist').className =
+            document.getElementById('album').className = (tlen > 35 ? "long" :
+            "");
+
           dbid = "#{dbid}";
           paused = #{paused ? "true" : "false"};
 END
