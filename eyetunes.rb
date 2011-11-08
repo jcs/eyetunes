@@ -34,6 +34,7 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 require "rubygems"
+require "md5"
 
 # from the "rb-appscript" gem
 require "appscript"
@@ -51,7 +52,7 @@ class CurrentTrack < WEBrick::HTTPServlet::AbstractServlet
         <html>
         <head>
         <script type="text/javascript">
-          var dbid = 0;
+          var dbid = "";
           var paused = false;
 
           function fetch() {
@@ -160,12 +161,23 @@ class CurrentTrack < WEBrick::HTTPServlet::AbstractServlet
 END
 
     when "/track"
-      dbid = 0
+      track = nil
+      dbid = ""
       paused = false
+      radio = false
+      radio_title = nil
       begin
         if app("System Events").processes["iTunes"].get
           track = app("iTunes").current_track
-          dbid = track.database_ID.get.to_i
+          if track.kind.get.to_s.match(/^Internet audio/)
+            radio = true
+            radio_title = app("iTunes").current_stream_title.get
+
+            # fudge so we still update when the track changes
+            dbid = MD5.hexdigest(radio_title)
+          else
+            dbid = track.database_ID.get.to_s
+          end
 
           if app("iTunes").player_state.get != :playing
             paused = true
@@ -174,7 +186,7 @@ END
       rescue
       end
 
-      if dbid.to_s == request.query["dbid"] &&
+      if dbid == request.query["dbid"].to_s &&
       ((request.query["paused"] == "1") == paused)
         response.status = 200
         response["Content-Type"] = "application/javascript"
@@ -182,13 +194,19 @@ END
       else
         artwork = nil
         artwork_type = nil
+        title = ""
+        artist = ""
+        album = ""
+        stars = ""
 
-        if dbid == 0
-          title = ""
-          artist = ""
-          album = ""
-          stars = ""
-        else
+        if radio
+          pieces = radio_title.split(" - ")
+
+          artist = pieces[0]
+          title = pieces[1]
+          album = track.name.get.to_s
+
+        elsif dbid != ""
           begin
             if track.artworks.get
               data = track.artworks[1].data_.get.data
@@ -208,25 +226,26 @@ END
           end
 
           title = track.name.get
-          if title.to_s == ""
-            title = "Unknown Track"
-          end
-
           artist = track.artist.get
-          if artist.to_s == ""
-            artist = "Unknown Artist"
-          end
-
           album = track.album.get
-          if album.to_s == ""
-            album = "Unknown Album"
-          end
 
           rating = track.rating.get.to_i
           stars = ((1 .. (rating.to_f / 20.0).floor).to_a.map{ "&#9733;" } +
             [ "<span class=\"nostar\">" ] +
             (1 .. ((100.0 - rating.to_f) / 20.0).floor).to_a.map{ "&#9734;" } +
             [ "</span>" ]).join("")
+        end
+
+        if title.to_s == ""
+          title = "Unknown Track"
+        end
+
+        if artist.to_s == ""
+          artist = "Unknown Artist"
+        end
+
+        if album.to_s == ""
+          album = "Unknown Album"
         end
 
         if artwork
