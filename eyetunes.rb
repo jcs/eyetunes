@@ -8,7 +8,7 @@
 # browser, uses webkit's marquee css to scroll long track names back and forth
 # smoothly.
 #
-# Copyright (c) 2010 joshua stein <jcs@jcs.org>
+# Copyright (c) 2010-2012 joshua stein <jcs@jcs.org>
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -38,7 +38,9 @@ require "md5"
 
 # from the "rb-appscript" gem
 require "appscript"
-include Appscript
+
+# itunes 10.6.3 fix
+require "appscript_itunes_fix"
 
 require "webrick"
 
@@ -362,15 +364,17 @@ END
     when "/track"
       track = nil
       dbid = ""
-      paused = false
+      paused = true
       radio = false
       radio_title = nil
       begin
-        if app("System Events").processes["iTunes"].get
-          track = app("iTunes").current_track
+        if Appscript.app("System Events").processes["iTunes"].get
+          app = Appscript.app.by_name("iTunes", ITunesFix)
+
+          track = app.current_track
           if track.kind.get.to_s.match(/^Internet audio/)
             radio = true
-            radio_title = app("iTunes").current_stream_title.get
+            radio_title = app.current_stream_title.get
 
             # fudge so we still update when the track changes
             dbid = MD5.hexdigest(radio_title)
@@ -378,8 +382,8 @@ END
             dbid = track.database_ID.get.to_s
           end
 
-          if app("iTunes").player_state.get != :playing
-            paused = true
+          if app.player_state.get != :paused
+            paused = false
           end
         end
       rescue
