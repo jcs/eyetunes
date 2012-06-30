@@ -637,7 +637,11 @@ private
   end
 end
 
-s = WEBrick::HTTPServer.new(:Port => 2000)
+s = WEBrick::HTTPServer.new(
+  :Port => 2000,
+  :Logger => WEBrick::Log.new("/dev/null"),
+  :AccessLog => [ nil, nil ]
+)
 s.mount "/", CurrentTrack
 Signal.trap(2) { s.shutdown }
 s.start
