@@ -34,13 +34,12 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 require "rubygems"
-require "md5"
 
 # from the "rb-appscript" gem
 require "appscript"
 
 # itunes 10.6.3 fix
-require "appscript_itunes_fix"
+require File.dirname(__FILE__) + "/appscript_itunes_fix"
 
 require "webrick"
 
@@ -313,7 +312,7 @@ private
     while pos + 11 < data.length
       head = data[pos, 11]
 
-      if head.to_s.match(/^\xff\xd8\xff...(JFIF|Exif)\x00/)
+      if head.to_s.match(Regexp.new('^\xff\xd8\xff...(JFIF|Exif)\x00', nil, "n"))
         return data[pos ... data.length]
       else
         pos += 1
