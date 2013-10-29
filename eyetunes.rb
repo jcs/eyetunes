@@ -328,7 +328,7 @@ private
     while pos + 8 < data.length
       head = data[pos, 8]
 
-      if head.to_s == "\x89\x50\x4e\x47\x0d\x0a\x1a\x0a"
+      if head.to_s == "\x89PNG\r\n\x1A\n".b
         return data[pos ... data.length]
       else
         pos += 1
