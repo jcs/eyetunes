@@ -41,6 +41,7 @@
 }
 
 - (id)initWithX:(int)x y:(int)y width:(int)width height:(int)height;
+- (void)refresh:(id)sender;
 - (void)loadURL:(NSString *)url;
 
 @end

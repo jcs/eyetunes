@@ -66,18 +66,41 @@
 	[self makeFirstResponder:browser];
 	[self makeKeyAndOrderFront:self];
 
+	/* add a simple menu to refresh and quit */
+	NSMenu *menubar = [[NSMenu new] autorelease];
+	NSMenuItem *appMenuItem = [[NSMenuItem new] autorelease];
+	[menubar addItem:appMenuItem];
+	[NSApp setMainMenu:menubar];
+
+	NSMenu *appMenu = [[NSMenu new] autorelease];
+	NSMenuItem *refresher = [[[NSMenuItem alloc] initWithTitle:@"Refresh"
+		action:@selector(refresh:) keyEquivalent:@"r"] autorelease];
+	[refresher setTarget:self];
+	[refresher setEnabled:YES];
+	[appMenu addItem:refresher];
+
+	[appMenu addItem:[[[NSMenuItem alloc] initWithTitle:@"Quit"
+		action:@selector(terminate:) keyEquivalent:@"q"] autorelease]];
+
+	[appMenuItem setSubmenu:appMenu];
+
 	return self;
+}
+
+- (void)refresh:(id)sender
+{
+	[wframe loadRequest:[NSURLRequest requestWithURL:currentURL]];
 }
 
 - (void)loadURL:(NSString *)url
 {
-	NSURL *u = [NSURL URLWithString:url];
+	currentURL = [NSURL URLWithString:url];
 
-	if ([[u scheme] length] == 0)
-		u = [NSURL URLWithString:[NSString stringWithFormat:@"http://%@",
-			url]];
+	if ([[currentURL scheme] length] == 0)
+		currentURL = [NSURL URLWithString:[NSString
+			stringWithFormat:@"http://%@", url]];
 
-	[wframe loadRequest:[NSURLRequest requestWithURL:u]];
+	[wframe loadRequest:[NSURLRequest requestWithURL:currentURL]];
 }
 
 @end
