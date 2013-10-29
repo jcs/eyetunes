@@ -56,7 +56,6 @@ class CurrentTrack < WEBrick::HTTPServlet::AbstractServlet
         <script type="text/javascript">
           var dbid = "";
           var paused = false;
-          var time = "";
 
           function fetch() {
             var req = new XMLHttpRequest();
@@ -74,7 +73,7 @@ class CurrentTrack < WEBrick::HTTPServlet::AbstractServlet
               setTimeout(fetch, 500);
             };
             req.open("GET", "/track?dbid=" + dbid + "&paused=" +
-              (paused ? 1 : 0) + "&time=" + time, true);
+              (paused ? 1 : 0), true);
             req.send(null);
           }
         </script>
@@ -84,35 +83,6 @@ class CurrentTrack < WEBrick::HTTPServlet::AbstractServlet
             font-family: "helvetica neue";
             font-weight: bold;
             overflow-y: hidden;
-          }
-          div#time {
-            display: none;
-            z-index: 2;
-            width: 550px;
-            margin-top: 15px;
-            margin-left: auto;
-            margin-right: auto;
-          }
-          body.paused div#music {
-            display: none;
-          }
-          body.paused div#time {
-            display: block;
-          }
-          div#time div.l {
-            color: #222;
-            display: block;
-            float: left;
-            font-size: 30pt;
-            font-weight: normal;
-            height: 45px;
-            text-align: center;
-            text-shadow: 0px 0px 1px #222;
-            width: 47px;
-          }
-          div#time div.bright div.l {
-            color: white;
-            text-shadow: 0px 0px 5px white; //, 0px 0px 5px white;
           }
           ul {
             list-style: none;
@@ -172,188 +142,22 @@ class CurrentTrack < WEBrick::HTTPServlet::AbstractServlet
           span.year {
             color: #666;
           }
+          body.paused {
+            opacity: 0.3;
+          }
           body.paused div#track {
             overflow-x: hidden;
           }
         </style>
         </head>
         <body>
-        <div id="time">
-          <div id="time_it">
-            <div class="l">I</div>
-            <div class="l">T</div>
-          </div>
-          <div class="l">L</div>
-          <div id="time_is">
-            <div class="l">I</div>
-            <div class="l">S</div>
-          </div>
-          <div class="l">A</div>
-          <div class="l">S</div>
-          <div class="l">T</div>
-          <div class="l">I</div>
-          <div class="l">M</div>
-          <div class="l">E</div>
-          <br>
-          <div id="time_a">
-            <div class="l">A</div>
-          </div>
-          <div class="l">C</div>
-          <div id="time_quarter">
-            <div class="l">Q</div>
-            <div class="l">U</div>
-            <div class="l">A</div>
-            <div class="l">R</div>
-            <div class="l">T</div>
-            <div class="l">E</div>
-            <div class="l">R</div>
-          </div>
-          <div class="l">D</div>
-          <div class="l">C</div>
-          <br>
-          <div id="time_twenty">
-            <div class="l">T</div>
-            <div class="l">W</div>
-            <div class="l">E</div>
-            <div class="l">N</div>
-            <div class="l">T</div>
-            <div class="l">Y</div>
-          </div>
-          <div id="time_five">
-            <div class="l">F</div>
-            <div class="l">I</div>
-            <div class="l">V</div>
-            <div class="l">E</div>
-          </div>
-          <div class="l">X</div>
-          <br>
-          <div id="time_half">
-            <div class="l">H</div>
-            <div class="l">A</div>
-            <div class="l">L</div>
-            <div class="l">F</div>
-          </div>
-          <div class="l">B</div>
-          <div id="time_ten">
-            <div class="l">T</div>
-            <div class="l">E</div>
-            <div class="l">N</div>
-          </div>
-          <div class="l">F</div>
-          <div id="time_to">
-            <div class="l">T</div>
-            <div class="l">O</div>
-          </div>
-          <br>
-          <div id="time_past">
-            <div class="l">P</div>
-            <div class="l">A</div>
-            <div class="l">S</div>
-            <div class="l">T</div>
-          </div>
-          <div class="l">E</div>
-          <div class="l">R</div>
-          <div class="l">U</div>
-          <div id="time_h_nine">
-            <div class="l">N</div>
-            <div class="l">I</div>
-            <div class="l">N</div>
-            <div class="l">E</div>
-          </div>
-          <br>
-          <div id="time_h_one">
-            <div class="l">O</div>
-            <div class="l">N</div>
-            <div class="l">E</div>
-          </div>
-          <div id="time_h_six">
-            <div class="l">S</div>
-            <div class="l">I</div>
-            <div class="l">X</div>
-          </div>
-          <div id="time_h_three">
-            <div class="l">T</div>
-            <div class="l">H</div>
-            <div class="l">R</div>
-            <div class="l">E</div>
-            <div class="l">E</div>
-          </div>
-          <br>
-          <div id="time_h_four">
-            <div class="l">F</div>
-            <div class="l">O</div>
-            <div class="l">U</div>
-            <div class="l">R</div>
-          </div>
-          <div id="time_h_five">
-            <div class="l">F</div>
-            <div class="l">I</div>
-            <div class="l">V</div>
-            <div class="l">E</div>
-          </div>
-          <div id="time_h_two">
-            <div class="l">T</div>
-            <div class="l">W</div>
-            <div class="l">O</div>
-          </div>
-          <br>
-          <div id="time_h_eight">
-            <div class="l">E</div>
-            <div class="l">I</div>
-            <div class="l">G</div>
-            <div class="l">H</div>
-            <div class="l">T</div>
-          </div>
-          <div id="time_h_eleven">
-            <div class="l">E</div>
-            <div class="l">L</div>
-            <div class="l">E</div>
-            <div class="l">V</div>
-            <div class="l">E</div>
-            <div class="l">N</div>
-          </div>
-          <br>
-          <div id="time_h_seven">
-            <div class="l">S</div>
-            <div class="l">E</div>
-            <div class="l">V</div>
-            <div class="l">E</div>
-            <div class="l">N</div>
-          </div>
-          <div id="time_h_twelve">
-            <div class="l">T</div>
-            <div class="l">W</div>
-            <div class="l">E</div>
-            <div class="l">L</div>
-            <div class="l">V</div>
-            <div class="l">E</div>
-          </div>
-          <br>
-          <div id="time_h_ten">
-            <div class="l">T</div>
-            <div class="l">E</div>
-            <div class="l">N</div>
-          </div>
-          <div class="l">S</div>
-          <div class="l">E</div>
-          <div id="time_h_oclock">
-            <div class="l">O</div>
-            <div class="l">C</div>
-            <div class="l">L</div>
-            <div class="l">O</div>
-            <div class="l">C</div>
-            <div class="l">K</div>
-          </div>
-        </div>
-        <div id="music">
-          <div id="track"></div>
-          <img id="art">
-          <div id="artistalbum">
-          <ul>
-          <li id="artist"></li>
-          <li id="album"></li>
-          <li id="stars"></li>
-          </div>
+        <div id="track"></div>
+        <img id="art">
+        <div id="artistalbum">
+        <ul>
+        <li id="artist"></li>
+        <li id="album"></li>
+        <li id="stars"></li>
         </div>
         <script type="text/javascript">
           fetch();
@@ -393,108 +197,7 @@ END
       ((request.query["paused"] == "1") == paused)
         response.status = 200
         response["Content-Type"] = "application/javascript"
-
-        hour = Time.now.strftime("%I").to_i
-        mins = Time.now.min
-
-        if request.query["time"].to_s == "#{hour}#{mins}"
-          response.body = ";"
-        else
-          all_digits = [ 
-            "it",
-            "is",
-            "a",
-            "quarter",
-            "twenty",
-            "five",
-            "half",
-            "ten",
-            "to",
-            "past",
-            "h_nine",
-            "h_one",
-            "h_six",
-            "h_three",
-            "h_four",
-            "h_five",
-            "h_two",
-            "h_eight",
-            "h_eleven",
-            "h_seven",
-            "h_twelve",
-            "h_ten",
-            "h_oclock",
-          ]
-
-
-          hours = [ "", "one", "two", "three", "four", "five", "six",
-            "seven", "eight", "nine", "ten", "eleven", "twelve", "one" ]
-
-          light_up = [ "it", "is" ]
-
-          if mins >= 0 && mins <= 4
-            light_up.push "h_#{hours[hour]}"
-            light_up.push "h_oclock"
-          elsif mins >= 5 && mins <= 9
-            light_up.push "five"
-            light_up.push "past"
-            light_up.push "h_#{hours[hour]}"
-          elsif mins >= 10 && mins <= 14
-            light_up.push "ten"
-            light_up.push "past"
-            light_up.push "h_#{hours[hour]}"
-          elsif mins >= 15 && mins <= 19
-            light_up.push "quarter"
-            light_up.push "past"
-            light_up.push "h_#{hours[hour]}"
-          elsif mins >= 20 && mins <= 24
-            light_up.push "twenty"
-            light_up.push "past"
-            light_up.push "h_#{hours[hour]}"
-          elsif mins >= 25 && mins <= 29
-            light_up.push "twenty"
-            light_up.push "five"
-            light_up.push "past"
-            light_up.push "h_#{hours[hour]}"
-          elsif mins >= 30 && mins <= 34
-            light_up.push "half"
-            light_up.push "past"
-            light_up.push "h_#{hours[hour]}"
-
-          # to next hour
-
-          elsif mins >= 35 && mins <= 39
-            light_up.push "twenty"
-            light_up.push "five"
-            light_up.push "to"
-            light_up.push "h_#{hours[hour + 1]}"
-          elsif mins >= 40 && mins <= 44
-            light_up.push "twenty"
-            light_up.push "to"
-            light_up.push "h_#{hours[hour + 1]}"
-          elsif mins >= 43 && mins <= 49
-            light_up.push "a"
-            light_up.push "quarter"
-            light_up.push "to"
-            light_up.push "h_#{hours[hour + 1]}"
-          elsif mins >= 50 && mins <= 54
-            light_up.push "ten"
-            light_up.push "to"
-            light_up.push "h_#{hours[hour + 1]}"
-          elsif mins >= 55
-            light_up.push "five"
-            light_up.push "to"
-            light_up.push "h_#{hours[hour + 1]}"
-          end
-
-          all_digits.each do |d|
-            response.body << "document.getElementById('time_#{d}')." <<
-              "className = '" << (light_up.include?(d) ? "bright" : "") <<
-              "';"
-          end
-
-          response.body << "time = '#{hour}#{mins}';"
-        end
+        response.body = ";"
       else
         artwork = nil
         artwork_type = nil
